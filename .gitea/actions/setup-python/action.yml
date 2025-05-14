@@ -31,4 +31,3 @@ runs:
       run: |
         uv sync --frozen --all-groups
       shell: bash
-      id: install-deps
