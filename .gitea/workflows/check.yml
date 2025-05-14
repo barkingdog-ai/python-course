@@ -1,0 +1,128 @@
+name: Run Python Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  PYTHON_VERSION: 3.13.3
+  UV_VERSION: 0.7.3
+  UV_FROZEN: true
+  IS_CLOUD_CI: ${{ github.actor != 'nektos/act' }}
+
+jobs:
+  pr_title_check:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+
+    steps:
+      - name: Checkout file
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install the project Dependencies
+        run: pip install -U cz-conventional-gitmoji typer --root-user-action ignore
+
+      - name: Check and Set new title
+        if: ${{ env.IS_CLOUD_CI == 'true' }}
+        run: |
+          PR_TITLE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | \
+            jq -r '.title')
+          echo "Latest PR title: $PR_TITLE"
+
+          python src/x_utils/pr_title.py "$PR_TITLE"
+          echo "NEW_TITLE=$(python src/x_utils/pr_title.py "$PR_TITLE" 2>&1)" >> $GITHUB_ENV
+
+      - name: Update PR title
+        if: ${{ env.IS_CLOUD_CI == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const oldTitle = context.payload.pull_request.title;
+            const newTitle = process.env.NEW_TITLE;
+
+            console.log(`Old title: '${oldTitle}'`);
+            console.log(`New title: '${newTitle}'`);
+
+            if (oldTitle !== newTitle) {
+              console.log(`Changing title from '${oldTitle}' to '${newTitle}'`);
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                title: newTitle
+              });
+            } else {
+              console.log('Title is the same, no update needed.');
+            }
+
+  lint:
+    needs: pr_title_check
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+
+    steps:
+      - name: Checkout file
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install the project Dependencies
+        run: |
+          pip install ruff -U --root-user-action=ignore
+
+      - name: Run ruff format
+        run: |
+          ruff format --check
+
+      - name: Run ruff check
+        run: |
+          ruff check
+
+  mypy:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+
+    steps:
+      - name: Checkout file
+        uses: actions/checkout@v4
+
+      - name: Setup Python with uv
+        uses: ./.gitea/actions/setup-python-with-uv
+        with:
+          uv-version: ${{ env.UV_VERSION }}
+
+      - name: Cache mypy
+        uses: actions/cache@v4
+        with:
+          path: .mypy_cache
+          key: mypy-cache-${{ runner.os }}-${{ hashFiles('**/*.py') }}
+          restore-keys: |
+            mypy-cache-${{ runner.os }}-
+        id: mypy-cache
+
+      - name: Run mypy
+        run: |
+          if [ "${{ steps.mypy-cache.outputs.cache-hit }}" = "true" ]; then
+            echo "🎯 mypy_cache HIT"
+          else
+            echo "💔 mypy_cache MISS"
+          fi
+
+          uv run mypy .
