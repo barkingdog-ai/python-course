@@ -1,0 +1,237 @@
+[project]
+name = "python-course"
+version = "0.1.0"
+description = "Python Course"
+authors = [
+    { name = "sushi", email = "yihsiang@barkingdog.ai" },
+    { name = "alan", email = "alan@barkingdog.ai" },
+]
+
+requires-python = ">=3.13.3,<3.14"
+dependencies = [
+    "rich>=14.0.0",
+    "icecream>=2.1.4",
+    "loguru>=0.7.3",
+    "python-dotenv>=1.1.0",
+    "pydantic>=2.11.4",
+    "pydantic-settings>=2.9.1",
+    "orjson>=3.10.18",
+    "ruamel-yaml>=0.18.10",
+]
+
+
+[project.urls]
+Repository = "https://git.thebarkingdog.tw/T-Ambassador/python-course"
+
+
+[dependency-groups]
+langchain = [
+    "langchain>=0.3.25",
+    "langchain-core>=0.3.59",
+    "langchain-community>=0.3.24",
+    "langchain-experimental>=0.3.4",
+    "langchain-openai>=0.3.16",
+]
+api = [
+    "fastapi[all]>=0.115.12",
+    "httpx-sse>=0.4.0",
+]
+app = [
+    "streamlit>=1.45.1",
+]
+
+dev = [
+    "pre-commit>=4.2.0",
+    "ruff>=0.11.9",
+    "mypy>=1.15.0",
+    "commitizen>=4.7.0",
+    "cz-conventional-gitmoji>=0.7.0",
+    "datamodel-code-generator>=0.30.1",
+    "shpyx>=0.0.33",
+]
+
+jupyter = [
+    "notebook>=7.4.2",
+    "ipywidgets>=8.1.7",
+]
+
+[tool.uv]
+default-groups = ["langchain", "api", "app"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/python_course"]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["src"]
+
+
+## ruff
+# <https://docs.astral.sh/ruff/settings/>
+[tool.ruff]
+required-version = ">=0.11.9"
+target-version = "py313"
+output-format = "concise"
+show-fixes = true
+line-length = 120
+
+[tool.ruff.lint]
+preview = true
+select = ["ALL"]
+exclude = ["playground/*.py"]
+
+ignore = [
+    ### Intentionally disabled
+    "E501",   # line-too-long (format 會自動處理)
+    "COM819", # prohibited-trailing-commas (與 ruff format 同時使用時候，執行順序將影響結果)
+    "COM812", # missing-trailing-comma (會與 ruff format 衝突)
+
+    "S101",   # assert  (不允許使用 assert)
+    "RUF001", # ambiguous-unicode-character-string (不要使用不明確的 Unicode 字元)
+    "RUF002", # ambiguous-unicode-character-docstring (不要使用不明確的 Unicode 字元)
+    "RUF003", # ambiguous-unicode-character-comment (不要使用不明確的 Unicode 字元)
+    "D415",   # ends-in-punctuation (註釋結尾應該有標點符號)
+    "TD001",  # invalid-todo-tag (禁止使用 TODO 以外的 tag)
+    "FIX001", # line-contains-fixme (註釋包含 FIXME)
+    "FIX002", # flake8-fixme (註釋包含 TODO)
+
+    "B008",   # unction-call-in-default-argument (不要在默認參數中調用函數)
+    "FBT",    # flake8-boolean-trap (不要使用 True/False 作為函數的位置參數)
+    "SIM117", # multiple-with-statements (不要使用嵌套 with)
+    "EM",     # flake8-errmsg (錯誤訊息字串要先分配給變數)
+    "TRY003", # raise-vanilla-args (自定義例外包含額外的長訊息)
+    "TRY400", # error-instead-of-exception (logging 應該用 exception 取代 error)
+
+    ### TODO: Enable gradually
+    "D101", # undocumented-public-class (未註釋的 public class)
+    "D104", # undocumented-public-package (未註釋的 public package)
+    "D107", # undocumented-public-init (未註釋的 public __init__)
+
+    ### preview
+    "DOC",    # pydoclint (docstring 需要完整寫出 return / yield / raise)
+    "CPY001", # missing-copyright-notice (缺少版權聲明)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"!src/python_course/backend/*.py" = [
+    "D", # Ignore `D` rules everywhere except for the `python_course/'
+]
+"src/x_utils/*.py" = [
+    "T201", # print (允許使用 print)
+]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-type-checking]
+exempt-modules = [
+    "typing",
+    "typing_extensions",
+    "langchain_core.runnables.RunnableConfig",
+]
+
+[tool.ruff.lint.pylint]
+max-returns = 6     # default is 6
+max-branches = 12   # default is 12
+max-args = 6        # default is 5
+max-statements = 50 # default is 50
+
+[tool.ruff.format]
+docstring-code-format = true
+skip-magic-trailing-comma = false # 預設就是 false，當你想要消除尾隨逗號時候可以暫時開啟
+
+
+## mypy
+# <https://mypy.readthedocs.io/en/stable/config_file.html>
+[tool.mypy]
+python_version = "3.13"
+plugins = ["pydantic.mypy"]
+files = ["."]
+exclude = ["playground"]
+strict = true
+pretty = true
+# <https://mypy.readthedocs.io/en/stable/error_code_list2.html>
+enable_error_code = [
+    "possibly-undefined",
+    "redundant-expr",
+    "truthy-iterable",
+    "explicit-override",
+    "mutable-override",
+]
+
+[[tool.mypy.overrides]]
+module = ["icecream"]
+ignore_missing_imports = true
+
+
+## pyright
+# <https://microsoft.github.io/pyright/#/configuration>
+# uv pip install "pyright[nodejs]"
+[tool.pyright]
+pythonVersion = "3.13"
+include = ["src/"]
+
+# Type Evaluation Settings
+strictListInference = true
+strictDictionaryInference = true
+strictSetInference = true
+deprecateTypingAliases = true
+enableReachabilityAnalysis = true
+enableExperimentalFeatures = true
+
+# Level Setting
+typeCheckingMode = "strict"
+
+# basic level
+reportCallIssue = "none"
+reportArgumentType = "none"
+reportTypedDictNotRequiredAccess = "none"
+
+# strict level
+reportUnnecessaryCast = "none"          # mypy 可能無法推斷，如有非必要 cast，以 mypy 檢查為主。
+reportUntypedFunctionDecorator = "none" # override 屬性，與 mypy 行為不一致，目前以 mypy 為主。
+reportUnknownLambdaType = "none"        # lambda 無法標注類型。
+reportMissingTypeStubs = "none"         # 特定套件沒有提供型別提示。
+
+reportUnknownVariableType = "none" # 第三方套件太多 Unknown
+reportUnknownArgumentType = "none" # 第三方套件太多 Unknown
+reportUnknownMemberType = "none"   # 第三方套件太多 Unknown，暫時當 Any 處理。
+
+
+## datamodel-codegen
+# <https://koxudaxi.github.io/datamodel-code-generator/>
+[tool.datamodel-codegen]
+target-python-version = "3.13"
+output-model-type = "pydantic_v2.BaseModel"
+field-constraints = true
+use-double-quotes = true
+use-subclass-enum = true
+set-default-enum-member = true
+capitalise-enum-members = true
+use-unique-items-as-set = true
+use-standard-collections = true
+use-union-operator = true
+allow-population-by-field-name = true
+snake-case-field = true
+# 如果有需要可以修改以下 input/output
+input-file-type = "openapi"
+url = "http://127.0.0.1:14792/openapi.json"
+# input = "playground/openapi.json"
+output = "playground/model.py"
+enable-version-header = true
+
+
+## cz
+# <https://commitizen-tools.github.io/commitizen/config/>
+[tool.commitizen]
+name = "cz_gitmoji"
+version_provider = "uv"
+version_files = ["src/python_course/__init__.py:__version__"]
+changelog_incremental = true
+allowed_prefixes = ["Merge", "Revert", "Squash"]
