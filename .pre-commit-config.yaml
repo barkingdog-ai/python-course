@@ -1,0 +1,116 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+# pre-commit install        啟用預設的 git hook，如果需要額外啟動其他 hook，可參考下一行
+# pre-commit install --hook-type post-checkout --hook-type post-merge --hook-type post-rewrite
+# pre-commit autoupdate     更新此檔案內使用的 repo 的版本
+
+# pre-commit run --all-files 全檔案檢查，而不是只有被提交的檔案
+# pre-commit run --hook-stage manual --all-files  如果需要額外檢查 manual 的項目
+# pre-commit run <hook_id> --all-files 只檢查特定一個 hook 是否通過
+
+# SKIP=check-added-large-files git commit -m "提交訊息"    暫時跳過特定 hock
+# git commit --no-verify 或者 git commit -n               跳過所有 commit hock
+# git push --no-verify                                   跳過所有 push hock
+
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
+
+default_language_version:
+  python: python3.13
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-ast
+      - id: check-case-conflict
+      - id: check-yaml
+      - id: check-toml
+      - id: check-xml
+
+  - repo: https://gitlab.com/bmares/check-json5
+    rev: v1.0.0
+    hooks:
+      - id: check-json5
+
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.14.0
+    hooks:
+      - id: pretty-format-yaml
+        args:
+          - --autofix
+          - --indent=2
+          - --offset=2
+
+  - repo: https://github.com/ComPWA/taplo-pre-commit
+    rev: v0.9.3
+    hooks:
+      - id: taplo-format
+        args: [-o, array_auto_collapse=false, -o, 'indent_string=    ']
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.9
+    hooks:
+      - id: ruff
+      - id: ruff-format
+        args: [--check]
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.18.0
+    hooks:
+      - id: markdownlint-cli2-docker
+        args: [--fix]
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.13.1-beta
+    hooks:
+      - id: hadolint-docker
+
+  - repo: https://github.com/IamTheFij/docker-pre-commit
+    rev: v3.0.1
+    hooks:
+      - id: docker-compose-check
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.26.0
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.7.3
+    hooks:
+      - id: uv-lock
+      - id: uv-sync
+        description: Automatically run 'uv sync' on your repository after a checkout, pull or rebase
+        args: [--all-groups]
+        stages: [post-checkout, post-merge, post-rewrite]
+        verbose: true
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.7.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+        additional_dependencies: [cz-conventional-gitmoji]
+
+  - repo: https://github.com/ljnsn/cz-conventional-gitmoji
+    rev: v0.7.0
+    hooks:
+      - id: conventional-gitmoji
+        stages: [commit-msg]
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy_check
+        stages: [pre-push]
+        language: system
+        entry: uv run mypy .
+        pass_filenames: false
+        types: [python]
+        args: [--config-file=pyproject.toml]
+        fail_fast: true
