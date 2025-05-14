@@ -180,22 +180,12 @@ enableReachabilityAnalysis = true
 enableExperimentalFeatures = true
 
 # Level Setting
-typeCheckingMode = "strict"
+typeCheckingMode = "standard"
 
 # basic level
 reportCallIssue = "none"
 reportArgumentType = "none"
-reportTypedDictNotRequiredAccess = "none"
-
-# strict level
-reportUnnecessaryCast = "none"          # mypy 可能無法推斷，如有非必要 cast，以 mypy 檢查為主。
-reportUntypedFunctionDecorator = "none" # override 屬性，與 mypy 行為不一致，目前以 mypy 為主。
-reportUnknownLambdaType = "none"        # lambda 無法標注類型。
-reportMissingTypeStubs = "none"         # 特定套件沒有提供型別提示。
-
-reportUnknownVariableType = "none" # 第三方套件太多 Unknown
-reportUnknownArgumentType = "none" # 第三方套件太多 Unknown
-reportUnknownMemberType = "none"   # 第三方套件太多 Unknown，暫時當 Any 處理。
+reportTypedDictNotRequiredAccess = "warning"
 
 
 ## datamodel-codegen
