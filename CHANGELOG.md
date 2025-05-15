@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.2 (2025-05-15)
+
+### 📝💡 Documentation
+
+- **README.md**: 新增 `pre-commit` 說明
+
+### 🔧🔨📦️ Configuration, Scripts, Packages
+
+- cz bump 自動更新 changelog
+
 ## 0.2.1 (2025-05-14)
 
 ### 🐛🚑️ Fixes
