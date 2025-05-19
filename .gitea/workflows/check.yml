@@ -3,13 +3,12 @@ name: Run Python Lint
 on:
   pull_request:
     branches:
-      - main
+      - '*'
 
 env:
   PYTHON_VERSION: 3.13.3
   UV_VERSION: 0.7.3
   UV_FROZEN: true
-  IS_CLOUD_CI: ${{ github.actor != 'nektos/act' }}
 
 jobs:
   lint:

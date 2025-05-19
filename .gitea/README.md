@@ -1,6 +1,6 @@
 # gitea
 
-本目錄包含專案的 GitTea CI/CD 工作流程設定，用於自動化程式碼檢查流程。
+本目錄包含專案的 GiTea CI/CD 工作流程設定，用於自動化程式碼檢查流程。
 
 ## workflows
 
@@ -8,10 +8,9 @@
 
 自動執行程式碼品質檢查。
 
-1. PR 標題格式檢查和自動更正
-2. 程式碼格式檢查 (ruff format & ruff check)
-3. 型別檢查 (mypy)
+1. 程式碼格式檢查 (ruff format & ruff check)
+2. 型別檢查 (mypy)
 
 **觸發條件**：
 
-- 創建針對 `main` 分支的 PR
+- 針對所有分支的 PR
