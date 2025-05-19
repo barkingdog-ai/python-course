@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.3 (2025-05-19)
+
+### 💚👷 CI & Build
+
+- 更新 CI 對所有 PR 都能觸發
+
+### 📌➕⬇️➖⬆️ Dependencies
+
+- update packages
+
 ## 0.2.2 (2025-05-15)
 
 ### 📝💡 Documentation
