@@ -53,14 +53,14 @@ repos:
         args: [-o, array_auto_collapse=false, -o, 'indent_string=    ']
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.9
+    rev: v0.11.10
     hooks:
       - id: ruff
       - id: ruff-format
         args: [--check]
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.18.0
+    rev: v0.18.1
     hooks:
       - id: markdownlint-cli2-docker
         args: [--fix]
@@ -81,7 +81,7 @@ repos:
       - id: gitleaks
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.7.3
+    rev: 0.7.5
     hooks:
       - id: uv-lock
       - id: uv-sync
@@ -91,7 +91,7 @@ repos:
         verbose: true
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.7.0
+    rev: v4.7.2
     hooks:
       - id: commitizen
         stages: [commit-msg]

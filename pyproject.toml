@@ -27,10 +27,10 @@ Repository = "https://git.thebarkingdog.tw/T-Ambassador/python-course"
 [dependency-groups]
 langchain = [
     "langchain>=0.3.25",
-    "langchain-core>=0.3.59",
+    "langchain-core>=0.3.60",
     "langchain-community>=0.3.24",
     "langchain-experimental>=0.3.4",
-    "langchain-openai>=0.3.16",
+    "langchain-openai>=0.3.17",
 ]
 api = [
     "fastapi[all]>=0.115.12",
@@ -42,9 +42,9 @@ app = [
 
 dev = [
     "pre-commit>=4.2.0",
-    "ruff>=0.11.9",
+    "ruff>=0.11.10",
     "mypy>=1.15.0",
-    "commitizen>=4.7.0",
+    "commitizen>=4.7.2",
     "cz-conventional-gitmoji>=0.7.0",
     "datamodel-code-generator>=0.30.1",
     "shpyx>=0.0.33",
@@ -72,7 +72,7 @@ only-include = ["src"]
 ## ruff
 # <https://docs.astral.sh/ruff/settings/>
 [tool.ruff]
-required-version = ">=0.11.9"
+required-version = ">=0.11.10"
 target-version = "py313"
 output-format = "concise"
 show-fixes = true
