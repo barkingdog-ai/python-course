@@ -2,7 +2,7 @@ from functools import lru_cache
 from typing import Any, override
 from zoneinfo import ZoneInfo
 
-from dotenv import find_dotenv
+from dotenv import find_dotenv, load_dotenv
 from icecream import ic
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -36,4 +36,5 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
+    load_dotenv()
     return Settings()
