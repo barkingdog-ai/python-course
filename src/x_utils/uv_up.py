@@ -38,7 +38,7 @@ class PackageSpec:
 
         for separator in (">=", "==", "<=", "~=", ">", "<", "!="):
             if separator in dependency:
-                name_part = dependency.split(separator)[0].strip()
+                name_part = dependency.split(separator, 1)[0].strip()
                 break
         else:
             name_part = dependency.strip()
@@ -185,7 +185,7 @@ def run_uv_command(
     for group, dependencies in all_dependencies.items():
         # filter out packages with pinned versions
         packages = [
-            PackageSpec.from_dependency(dep) for dep in dependencies if "==" not in dep
+            PackageSpec.from_dependency(dep) for dep in dependencies if "=>" in dep
         ]
 
         run_uv_action("remove", package_spec=packages, group=group)
