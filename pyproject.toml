@@ -13,10 +13,10 @@ dependencies = [
     "icecream>=2.1.4",
     "loguru>=0.7.3",
     "python-dotenv>=1.1.0",
-    "pydantic>=2.11.4",
+    "pydantic>=2.11.5",
     "pydantic-settings>=2.9.1",
     "orjson>=3.10.18",
-    "ruamel-yaml>=0.18.10",
+    "ruamel-yaml>=0.18.12",
 ]
 
 
@@ -27,10 +27,10 @@ Repository = "https://git.thebarkingdog.tw/T-Ambassador/python-course"
 [dependency-groups]
 langchain = [
     "langchain>=0.3.25",
-    "langchain-core>=0.3.60",
+    "langchain-core>=0.3.63",
     "langchain-community>=0.3.24",
     "langchain-experimental>=0.3.4",
-    "langchain-openai>=0.3.17",
+    "langchain-openai>=0.3.18",
 ]
 api = [
     "fastapi[all]>=0.115.12",
@@ -42,16 +42,16 @@ app = [
 
 dev = [
     "pre-commit>=4.2.0",
-    "ruff>=0.11.10",
-    "mypy>=1.15.0",
-    "commitizen>=4.7.2",
+    "ruff>=0.11.12",
+    "mypy>=1.16.0",
+    "commitizen>=4.8.2",
     "cz-conventional-gitmoji>=0.7.0",
     "datamodel-code-generator>=0.30.1",
     "shpyx>=0.0.33",
 ]
 
 jupyter = [
-    "notebook>=7.4.2",
+    "notebook>=7.4.3",
     "ipywidgets>=8.1.7",
 ]
 
@@ -72,7 +72,7 @@ only-include = ["src"]
 ## ruff
 # <https://docs.astral.sh/ruff/settings/>
 [tool.ruff]
-required-version = ">=0.11.10"
+required-version = ">=0.11.12"
 target-version = "py313"
 output-format = "concise"
 show-fixes = true

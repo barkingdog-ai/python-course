@@ -7,7 +7,7 @@ on:
 
 env:
   PYTHON_VERSION: 3.13.3
-  UV_VERSION: 0.7.5
+  UV_VERSION: 0.7.9
   UV_FROZEN: true
 
 jobs:
