@@ -216,7 +216,6 @@ enable-version-header = true
 [tool.commitizen]
 name = "cz_gitmoji"
 version_provider = "uv"
-version_files = ["src/python_course/__init__.py:__version__"]
 update_changelog_on_bump = true
 changelog_incremental = true
 allowed_prefixes = ["Merge", "Revert", "Squash"]
