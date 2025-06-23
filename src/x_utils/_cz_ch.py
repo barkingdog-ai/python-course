@@ -20,7 +20,7 @@ def render_cherry(origin_branch_name: str = "") -> str:
         changelog_pattern=CommitizenGitmojiCz.changelog_pattern,
         change_type_map=CommitizenGitmojiCz.change_type_map,
     )
-    order_tree = changelog.order_changelog_tree(
+    order_tree = changelog.generate_ordered_changelog_tree(
         tree, CommitizenGitmojiCz.change_type_order
     )
     return changelog.render_changelog(
