@@ -7,7 +7,7 @@ authors = [
     { name = "alan", email = "alan@barkingdog.ai" },
 ]
 
-requires-python = ">=3.13.3,<3.14"
+requires-python = ">=3.13.5,<3.14"
 dependencies = [
     "rich>=14.0.0",
     "icecream>=2.1.4",
