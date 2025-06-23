@@ -1,0 +1,73 @@
+name: Run Python Lint
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+env:
+  PYTHON_VERSION: 3.13.3
+  UV_VERSION: 0.7.9
+  UV_FROZEN: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+
+    steps:
+      - name: Checkout file
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install the project Dependencies
+        run: |
+          pip install ruff -U --root-user-action=ignore
+
+      - name: Run ruff format
+        run: |
+          ruff format --check
+
+      - name: Run ruff check
+        run: |
+          ruff check
+
+  mypy:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+
+    steps:
+      - name: Checkout file
+        uses: actions/checkout@v4
+
+      - name: Setup Python with uv
+        uses: ./.gitea/actions/setup-python
+        with:
+          uv-version: ${{ env.UV_VERSION }}
+
+      - name: Cache mypy
+        uses: actions/cache@v4
+        with:
+          path: .mypy_cache
+          key: mypy-cache-${{ runner.os }}-${{ hashFiles('**/*.py') }}
+          restore-keys: |
+            mypy-cache-${{ runner.os }}-
+        id: mypy-cache
+
+      - name: Run mypy
+        run: |
+          if [ "${{ steps.mypy-cache.outputs.cache-hit }}" = "true" ]; then
+            echo "🎯 mypy_cache HIT"
+          else
+            echo "💔 mypy_cache MISS"
+          fi
+
+          uv run mypy .
