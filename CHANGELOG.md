@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.5 (2025-06-24)
+
+### 🐛🚑️ Fixes
+
+- 修正錯誤的套件版本判斷
+
+### 💚👷 CI & Build
+
+- 修正安裝套件的權限問題
+- 修正錯誤腳本路徑
+- push github ci
+
+### 📌➕⬇️➖⬆️ Dependencies
+
+- 更新 python 與 uv 版本
+- 更新套件版本
+
+### 📝💡 Documentation
+
+- 修改 PR 模板
+
 ## 0.2.4 (2025-06-02)
 
 ### 🐛🚑️ Fixes
