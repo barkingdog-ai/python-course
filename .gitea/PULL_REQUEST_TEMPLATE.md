@@ -1,7 +1,7 @@
 # PR
 
 [redmine](https://redmine.thebarkingdog.tw/issues/?)
-issue: #
+resolved #
 
 ## Description
 
