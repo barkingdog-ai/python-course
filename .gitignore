@@ -176,5 +176,11 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
 # uncomment if you don't need it
 playground/
