@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.6 (2025-07-02)
+
+### 🙈 Ignore
+
+- Adds macOS .gitignore entries
+
 ## 0.2.5 (2025-06-24)
 
 ### 🐛🚑️ Fixes
