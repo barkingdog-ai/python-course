@@ -18,6 +18,8 @@ from typing_extensions import TypedDict
 # %%
 load_dotenv()
 api_key_l = os.getenv("LANG_SMITH_API_KEY")
+if api_key_l is None:
+    raise ValueError("LANGSMITH_API_KEY is not set")
 # %%
 if not os.environ.get("LANG_SMITH_API_KEY"):
     os.environ["LANG_SMITH_API_KEY"] = getpass.getpass()
@@ -92,27 +94,25 @@ memory = MemorySaver()
 app = workflow.compile(checkpointer=memory)
 
 # %%
-config = {"configurable": {"thread_id": "abc123"}}
-
+config = {
+    "tags": ["chat"],
+    "metadata": {"user_id": "abc123"},
+    "run_name": "chat-session-1",
+}
 # %%
 query = "Hi! I'm Dog. Write me a self introduction with 100 words."
-language = "English"
+language: str = "English"
 
-input_messages = [HumanMessage(query)]
-for chunk, _ in app.stream(
-    {"messages": input_messages, "language": language},
-    config=config,
-    stream_mode="messages",
-):
-    if isinstance(chunk, AIMessage):  # Filter to just model responses
-        print(chunk.content, end="|")  # noqa: T201
+input_messages: Sequence[BaseMessage] = [HumanMessage(query)]
+state: State = {"messages": input_messages, "language": language}
+for output, _ in app.stream(state, config, stream_mode="messages"):
+    if isinstance(output, AIMessage):  # Filter to just model responses
+        print(output.content, end="|")  # noqa: T201
 
 # %%
 query = "Who am I?"
 
 input_messages = [HumanMessage(query)]
-output = app.invoke(
-    {"messages": input_messages, "language": language},
-    config=config,
-)
+state = {"messages": input_messages, "language": language}
+output = app.invoke(state, config)
 output["messages"][-1].pretty_print()
