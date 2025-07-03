@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.7 (2025-07-03)
+
+### 💚👷 CI & Build
+
+- update uv version
+
+### 📌➕⬇️➖⬆️ Dependencies
+
+- update dependencies
+
 ## 0.2.6 (2025-07-02)
 
 ### 🙈 Ignore
