@@ -8,7 +8,7 @@ from typing import Annotated
 
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, trim_messages
+from langchain_core.messages import AIMessage, BaseMessage, trim_messages
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, StateGraph
@@ -48,12 +48,6 @@ class State(TypedDict):
     language: str
 
 
-class Config(TypedDict):
-    tags: list[str]
-    metadata: dict[str, str]
-    run_name: str
-
-
 # %%
 prompt_template = ChatPromptTemplate.from_messages(
     [
@@ -82,7 +76,7 @@ def get_trimmed_history(state: State) -> list[BaseMessage]:
 def call_model(state: State) -> dict[str, list[BaseMessage]]:
     trimmed_messages = get_trimmed_history(state)
     prompt = prompt_template.invoke(
-        {"messages": trimmed_messages, "language": "language"}
+        {"messages": trimmed_messages, "language": state["language"]}
     )
 
     result = model.invoke(prompt)
@@ -104,38 +98,3 @@ workflow.set_finish_point("model")
 # Add memory
 memory = MemorySaver()
 langgraph_app = workflow.compile(checkpointer=memory)
-
-# %%
-config = {
-    "tags": ["chat"],
-    "metadata": {"user_id": "abc123"},
-    "run_name": "chat-session-1",
-}
-
-query = "Hi! I'm Dog. Write me a self introduction with 100 words."
-language: str = "English"
-
-input_messages: Sequence[BaseMessage] = [HumanMessage(query)]
-state: State = {"messages": input_messages, "language": language}
-output = call_model(state)
-print(output)  # noqa: T201
-
-
-"""# %%
-query = "Hi! I'm Dog. Write me a self introduction with 100 words."
-language: str = "English"
-
-input_messages: Sequence[BaseMessage] = [HumanMessage(query)]
-state: State = {"messages": input_messages, "language": language}
-for output, _ in langgraph_app.stream(state, config, stream_mode="messages"):
-    if isinstance(output, AIMessage):  # Filter to just model responses
-        print(output.content, end="|")  # noqa: T201
-
-# %%
-query = "Who am I?"
-
-input_messages = [HumanMessage(query)]
-state = {"messages": input_messages, "language": language}
-output = langgraph_app.invoke(state, config)
-output["messages"][-1].pretty_print()
-"""
