@@ -48,8 +48,11 @@ class State(TypedDict):
     language: str
 
 
-# Define a new graph
-workflow = StateGraph(state_schema=State)
+class Config(TypedDict):
+    tags: list[str]
+    metadata: dict[str, str]
+    run_name: str
+
 
 # %%
 prompt_template = ChatPromptTemplate.from_messages(
@@ -62,36 +65,45 @@ prompt_template = ChatPromptTemplate.from_messages(
     ]
 )
 
-# %%
-trimmer = trim_messages(
-    max_tokens=500,
-    strategy="last",
-    token_counter=model,
-    include_system=True,
-    allow_partial=False,
-    start_on="human",
-)
+
+def get_trimmed_history(state: State) -> list[BaseMessage]:
+    trimmer = trim_messages(
+        max_tokens=500,
+        strategy="last",
+        token_counter=model,
+        include_system=True,
+        allow_partial=False,
+        start_on="human",
+    )
+    return trimmer.invoke(state["messages"])
 
 
 # Define to call the model
-def call_model(state: State) -> dict[str, BaseMessage]:
-    trimmed_messages = trimmer.invoke(state["messages"])
+def call_model(state: State) -> dict[str, list[BaseMessage]]:
+    trimmed_messages = get_trimmed_history(state)
     prompt = prompt_template.invoke(
-        {"messages": trimmed_messages, "language": state["language"]}
+        {"messages": trimmed_messages, "language": "language"}
     )
-    response = model.invoke(prompt)
-    return {"messages": response}
+
+    result = model.invoke(prompt)
+
+    input_messages = list(state["messages"])
+    return {"messages": [*input_messages, AIMessage(content=result.content)]}
 
 
 # %%
+# Define a new graph
+workflow = StateGraph(state_schema=State)
 # Define the (single) node in the graph
 workflow.add_edge(START, "model")
 workflow.add_node("model", call_model)
+workflow.set_entry_point("model")
+workflow.set_finish_point("model")
 
 # %%
 # Add memory
 memory = MemorySaver()
-app = workflow.compile(checkpointer=memory)
+langgraph_app = workflow.compile(checkpointer=memory)
 
 # %%
 config = {
@@ -99,13 +111,23 @@ config = {
     "metadata": {"user_id": "abc123"},
     "run_name": "chat-session-1",
 }
-# %%
+
 query = "Hi! I'm Dog. Write me a self introduction with 100 words."
 language: str = "English"
 
 input_messages: Sequence[BaseMessage] = [HumanMessage(query)]
 state: State = {"messages": input_messages, "language": language}
-for output, _ in app.stream(state, config, stream_mode="messages"):
+output = call_model(state)
+print(output)  # noqa: T201
+
+
+"""# %%
+query = "Hi! I'm Dog. Write me a self introduction with 100 words."
+language: str = "English"
+
+input_messages: Sequence[BaseMessage] = [HumanMessage(query)]
+state: State = {"messages": input_messages, "language": language}
+for output, _ in langgraph_app.stream(state, config, stream_mode="messages"):
     if isinstance(output, AIMessage):  # Filter to just model responses
         print(output.content, end="|")  # noqa: T201
 
@@ -114,5 +136,6 @@ query = "Who am I?"
 
 input_messages = [HumanMessage(query)]
 state = {"messages": input_messages, "language": language}
-output = app.invoke(state, config)
+output = langgraph_app.invoke(state, config)
 output["messages"][-1].pretty_print()
+"""
