@@ -10,11 +10,11 @@ authors = [
 requires-python = ">=3.13.5,<3.14"
 dependencies = [
     "rich>=14.0.0",
-    "icecream>=2.1.4",
+    "icecream>=2.1.5",
     "loguru>=0.7.3",
-    "python-dotenv>=1.1.0",
+    "python-dotenv>=1.1.1",
     "pydantic>=2.11.7",
-    "pydantic-settings>=2.10.0",
+    "pydantic-settings>=2.10.1",
     "orjson>=3.10.18",
     "ruamel-yaml>=0.18.14",
 ]
@@ -27,22 +27,22 @@ Repository = "https://git.thebarkingdog.tw/T-Ambassador/python-course"
 [dependency-groups]
 langchain = [
     "langchain>=0.3.26",
-    "langchain-core>=0.3.66",
-    "langchain-community>=0.3.26",
+    "langchain-core>=0.3.67",
+    "langchain-community>=0.3.27",
     "langchain-experimental>=0.3.4",
-    "langchain-openai>=0.3.25",
+    "langchain-openai>=0.3.27",
 ]
 api = [
-    "fastapi[all]>=0.115.13",
-    "httpx-sse>=0.4.0",
+    "fastapi[all]>=0.115.14",
+    "httpx-sse>=0.4.1",
 ]
 app = [
-    "streamlit>=1.46.0",
+    "streamlit>=1.46.1",
 ]
 
 dev = [
     "pre-commit>=4.2.0",
-    "ruff>=0.12.0",
+    "ruff>=0.12.1",
     "mypy>=1.16.1",
     "commitizen>=4.8.3",
     "cz-conventional-gitmoji>=0.7.0",
@@ -51,7 +51,7 @@ dev = [
 ]
 
 jupyter = [
-    "notebook>=7.4.3",
+    "notebook>=7.4.4",
     "ipywidgets>=8.1.7",
 ]
 
@@ -72,7 +72,7 @@ only-include = ["src"]
 ## ruff
 # <https://docs.astral.sh/ruff/settings/>
 [tool.ruff]
-required-version = ">=0.12.0"
+required-version = ">=0.12.1"
 target-version = "py313"
 output-format = "concise"
 show-fixes = true
