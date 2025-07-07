@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import AIMessage, BaseMessage, trim_messages
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables.config import RunnableConfig
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, StateGraph
 from langgraph.graph.message import add_messages
@@ -49,14 +50,6 @@ class State(TypedDict):
     language: str
 
 
-class Configurable(TypedDict):
-    thread_id: str
-
-
-class Config(TypedDict):
-    configurable: Configurable
-
-
 # %%
 prompt_template = ChatPromptTemplate.from_messages(
     [
@@ -83,7 +76,7 @@ def get_trimmed_history(state: State) -> list[BaseMessage]:
 
 
 def generate_response(
-    messages: list[BaseMessage], language: str, config: Config
+    messages: list[BaseMessage], language: str, config: RunnableConfig
 ) -> AIMessage:
     prompt = prompt_template.invoke({"messages": messages, "language": language})
     result = model.invoke(prompt, config)
@@ -91,7 +84,7 @@ def generate_response(
 
 
 # Define to call the model
-def call_model(state: State, config: Config) -> dict[str, list[BaseMessage]]:
+def call_model(state: State, config: RunnableConfig) -> dict[str, list[BaseMessage]]:
     trimmed_messages = get_trimmed_history(state)
 
     ai_msg = generate_response(trimmed_messages, state["language"], config)
