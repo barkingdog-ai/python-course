@@ -40,7 +40,6 @@ async def chat(req: ChatRequest) -> dict[str, str]:
         "messages": [HumanMessage(content=req.message)],
         "language": req.language,
     }
-    state = cast("State", state)
     config = cast("RunnableConfig", {"configurable": {"thread_id": thread_id}})
 
     final_output = ""
