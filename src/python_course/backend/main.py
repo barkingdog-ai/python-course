@@ -36,7 +36,7 @@ class ChatResponse(BaseModel):
 @app.post("/chat")
 async def chat(req: ChatRequest) -> dict[str, str]:
     thread_id = req.thread_id or str(uuid.uuid4())
-    state = {
+    state: State = {
         "messages": [HumanMessage(content=req.message)],
         "language": req.language,
     }
