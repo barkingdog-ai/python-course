@@ -50,7 +50,7 @@ if user_input:
 
     # Send to backend
     payload = {
-        "message": user_input,
+        "messages": user_input,
         "language": st.session_state.language,
         "thread_id": st.session_state.thread_id,
     }

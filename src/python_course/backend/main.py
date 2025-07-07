@@ -22,7 +22,7 @@ app.add_middleware(
 
 # Input structure from frontend
 class ChatRequest(BaseModel):
-    message: str
+    messages: str
     language: str
     thread_id: str
 
@@ -37,7 +37,7 @@ class ChatResponse(BaseModel):
 async def chat(req: ChatRequest) -> dict[str, str]:
     thread_id = req.thread_id or str(uuid.uuid4())
     state: State = {
-        "messages": [HumanMessage(content=req.message)],
+        "messages": [HumanMessage(content=req.messages)],
         "language": req.language,
     }
     config = cast("RunnableConfig", {"configurable": {"thread_id": thread_id}})
