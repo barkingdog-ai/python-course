@@ -32,7 +32,7 @@ class ChatResponse(BaseModel):
 
 
 @app.post("/chat")
-def chat(req: ChatRequest) -> dict[str, str]:
+async def chat(req: ChatRequest) -> dict[str, str]:
     thread_id = req.thread_id or str(uuid.uuid4())
     state = {
         "messages": [HumanMessage(content=req.message)],
@@ -41,10 +41,9 @@ def chat(req: ChatRequest) -> dict[str, str]:
     config = {"configurable": {"thread_id": thread_id}}
 
     final_output = ""
-    for output, _ in langgraph_app.stream(state, config=config, stream_mode="messages"):
-        messages = output.get("messages", [])
-        for msg in messages:
-            if isinstance(msg, AIMessage):
-                final_output += str(msg.content)
+    output = langgraph_app.invoke(state, config)
+    for message in output.get("messages", []):
+        if isinstance(message, AIMessage):
+            final_output = str(message.content)
 
     return {"response": final_output, "thread_id": thread_id}

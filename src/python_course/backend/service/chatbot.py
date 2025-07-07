@@ -1,6 +1,7 @@
 # %%
 import getpass
 import os
+import typing
 
 # %%
 from collections.abc import Sequence
@@ -48,6 +49,14 @@ class State(TypedDict):
     language: str
 
 
+class Configurable(TypedDict):
+    thread_id: str
+
+
+class Config(TypedDict):
+    configurable: Configurable
+
+
 # %%
 prompt_template = ChatPromptTemplate.from_messages(
     [
@@ -69,30 +78,34 @@ def get_trimmed_history(state: State) -> list[BaseMessage]:
         allow_partial=False,
         start_on="human",
     )
-    return trimmer.invoke(state["messages"])
+    result = trimmer.invoke(state["messages"])
+    return typing.cast("list[BaseMessage]", result)
+
+
+def generate_response(
+    messages: list[BaseMessage], language: str, config: Config
+) -> AIMessage:
+    prompt = prompt_template.invoke({"messages": messages, "language": language})
+    result = model.invoke(prompt, config)
+    return AIMessage(content=result.content)
 
 
 # Define to call the model
-def call_model(state: State) -> dict[str, list[BaseMessage]]:
+def call_model(state: State, config: Config) -> dict[str, list[BaseMessage]]:
     trimmed_messages = get_trimmed_history(state)
-    prompt = prompt_template.invoke(
-        {"messages": trimmed_messages, "language": state["language"]}
-    )
 
-    result = model.invoke(prompt)
-
-    input_messages = list(state["messages"])
-    return {"messages": [*input_messages, AIMessage(content=result.content)]}
+    ai_msg = generate_response(trimmed_messages, state["language"], config)
+    return {"messages": [*state["messages"], ai_msg]}
 
 
 # %%
 # Define a new graph
 workflow = StateGraph(state_schema=State)
 # Define the (single) node in the graph
-workflow.add_edge(START, "model")
-workflow.add_node("model", call_model)
-workflow.set_entry_point("model")
-workflow.set_finish_point("model")
+workflow.add_node("node", call_model)
+workflow.add_edge(START, "node")
+workflow.set_entry_point("node")
+workflow.set_finish_point("node")
 
 # %%
 # Add memory

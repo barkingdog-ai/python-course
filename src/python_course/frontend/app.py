@@ -5,7 +5,7 @@ import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage
 
 SUCCESS = 200
-TIME_OUT = 10
+TIME_OUT = 20
 
 st.title("🤓 LangGraph Chatbot")
 
@@ -29,13 +29,18 @@ st.sidebar.selectbox(
     key="language",
 )
 
+# Sidebar for new conversation
+if st.sidebar.button("Start New Conversation"):
+    st.session_state.thread_id = str(uuid.uuid4())
+    st.session_state.messages = []
+
 # Display chat history
 for msg in st.session_state.messages:
     role = "user" if isinstance(msg, HumanMessage) else "assistant"
     with st.chat_message(role):
         st.markdown(msg.content)
 
-user_input = st.chat_input("Hiiiii")
+user_input = st.chat_input("Ask anything")
 
 if user_input:
     # Show user message immediately
