@@ -1,11 +1,13 @@
 import uuid
+from typing import cast
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.runnables import RunnableConfig
 from pydantic import BaseModel
 
-from .service.chatbot import langgraph_app
+from .service.chatbot import State, langgraph_app
 
 app = FastAPI()
 
@@ -38,7 +40,8 @@ async def chat(req: ChatRequest) -> dict[str, str]:
         "messages": [HumanMessage(content=req.message)],
         "language": req.language,
     }
-    config = {"configurable": {"thread_id": thread_id}}
+    state = cast("State", state)
+    config = cast("RunnableConfig", {"configurable": {"thread_id": thread_id}})
 
     final_output = ""
     output = langgraph_app.invoke(state, config)
