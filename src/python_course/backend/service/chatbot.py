@@ -12,8 +12,6 @@ from langchain.chat_models import init_chat_model
 from langchain_core.messages import AIMessage, BaseMessage, trim_messages
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.config import RunnableConfig
-from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph import START, StateGraph
 from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
 
@@ -89,18 +87,3 @@ def call_model(state: State, config: RunnableConfig) -> dict[str, list[BaseMessa
 
     ai_msg = generate_response(trimmed_messages, state["language"], config)
     return {"messages": [*state["messages"], ai_msg]}
-
-
-# %%
-# Define a new graph
-workflow = StateGraph(state_schema=State)
-# Define the (single) node in the graph
-workflow.add_node("node", call_model)
-workflow.add_edge(START, "node")
-workflow.set_entry_point("node")
-workflow.set_finish_point("node")
-
-# %%
-# Add memory
-memory = MemorySaver()
-langgraph_app = workflow.compile(checkpointer=memory)

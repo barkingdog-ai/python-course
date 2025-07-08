@@ -43,7 +43,7 @@ async def chat(req: ChatRequest) -> dict[str, str]:
     config = cast("RunnableConfig", {"configurable": {"thread_id": thread_id}})
 
     final_output = ""
-    output = langgraph_app.invoke(state, config)
+    output = langgraph_app.invoke(state, config)  # type: ignore[arg-type]
     for message in output.get("messages", []):
         if isinstance(message, AIMessage):
             final_output = str(message.content)
