@@ -11,7 +11,7 @@ __pycache__/
 *.so
 
 # macOS
-.DS_
+.DS*
 
 # Distribution / packaging
 .Python
