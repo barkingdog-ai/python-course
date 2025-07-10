@@ -1,39 +1,43 @@
-import asyncio
-import os
-from _collections_abc import AsyncGenerator
+import uuid
+from _collections_abc import Generator
+from typing import cast
 
-import google.generativeai as genai
-from dotenv import load_dotenv
-from fastapi import FastAPI, Request
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, StreamingResponse
+from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableConfig
 from pydantic import BaseModel
+
+from .service.chatbot import State, langgraph_app
+
+LENGTH_THRES = 200
 
 app = FastAPI()
 
-load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-2.0-flash")
 
-
-class Message(BaseModel):
-    message: str
+# Input structure from frontend
+class ChatRequest(BaseModel):
+    messages: str
+    language: str
+    thread_id: str
 
 
 @app.post("/chat/stream/")
-async def chat_stream(message: Message, request: Request) -> StreamingResponse:
-    chat_session = model.start_chat()
+def chat_stream(req: ChatRequest) -> StreamingResponse:
+    thread_id = req.thread_id or str(uuid.uuid4())
+    state: State = {
+        "messages": req.messages,
+        "language": req.language,
+    }
+    config = cast("RunnableConfig", {"configurable": {"thread_id": thread_id}})
 
-    async def event_generator() -> AsyncGenerator[str, None]:
-        res_str = chat_session.send_message(message.message, stream=True)
-        for chunk in res_str:
-            if await request.is_disconnected():
-                print("Disconnected")  # noqa: T201
-                break
-            if chunk.text:
-                data = f"data: {chunk.text}\n\n"
-                yield data
-                await asyncio.sleep(0.1)
-        yield "data: [DONE]\n\n"
+    def event_generator() -> Generator[str, None]:
+        # Prevent timeout
+        yield "event: ping\ndata: keepalive\n\n"
+        for chunk, _ in langgraph_app.stream(state, config, stream_mode="messages"):
+            if isinstance(chunk, AIMessage) and chunk.content:
+                if len(chunk.content) > LENGTH_THRES:
+                    continue
+                yield f"event: chunk\ndata: {chunk.content}\n\n"
+        yield f"event: {'end'}\ndata: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

@@ -6,6 +6,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 SUCCESS = 200
 TIME_OUT = 20
+BACKEND_URL = "http://localhost:8000/chat/stream"
 
 st.title("🤓 LangGraph Chatbot")
 
@@ -55,26 +56,22 @@ if user_input:
         "thread_id": st.session_state.thread_id,
     }
 
+    response_holder = st.empty()
+    response_text = ""
     try:
-        response = requests.post(
-            "http://localhost:8000/chat", json=payload, timeout=TIME_OUT
-        )
-        if response.status_code == SUCCESS:
-            result = response.json()
+        with requests.post(
+            BACKEND_URL, json=payload, stream=True, timeout=TIME_OUT
+        ) as response:
+            for line in response.iter_lines(decode_unicode=True):
+                if line and line.startswith("data: "):
+                    chunk = line.removeprefix("data: ").strip()
+                    if chunk == "[DONE]":
+                        break
+                    response_text += chunk
+                    response_holder.markdown(response_text)
 
-            # c. Update thread ID if new
-            st.session_state.thread_id = result.get(
-                "thread_id", st.session_state.thread_id
-            )
-
-            # d. Show assistant response
-            ai_msg = AIMessage(content=result["response"])
-            st.session_state.messages.append(ai_msg)
-
-            with st.chat_message("assistant"):
-                st.markdown(ai_msg.content)
-        else:
-            st.error("API Error: " + response.text)
+        ai_msg = AIMessage(content=response_text)
+        st.session_state.messages.append(ai_msg)
 
     except requests.exceptions.RequestException as e:
-        st.error(f"Connection Error: {e}")
+        st.error(f"Connection error: {e}")
