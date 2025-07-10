@@ -2,7 +2,8 @@ import uuid
 from _collections_abc import Generator
 from typing import cast
 
-from fastapi import FastAPI, StreamingResponse
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
 from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableConfig
 from pydantic import BaseModel
