@@ -26,7 +26,7 @@ class ChatRequest(BaseModel):
 def chat_stream(req: ChatRequest) -> StreamingResponse:
     thread_id = req.thread_id or str(uuid.uuid4())
     state: State = {
-        "messages": req.messages,
+        "messages": req.messages,  # ignore: [typeddict-item]
         "language": req.language,
     }
     config = cast("RunnableConfig", {"configurable": {"thread_id": thread_id}})
@@ -34,7 +34,9 @@ def chat_stream(req: ChatRequest) -> StreamingResponse:
     def event_generator() -> Generator[str, None]:
         # Prevent timeout
         yield "event: ping\ndata: keepalive\n\n"
-        for chunk, _ in langgraph_app.stream(state, config, stream_mode="messages"):
+        for chunk, _ in langgraph_app.stream(
+            state, config, stream_mode="messages"
+        ):  # ignore: [arg-type]
             if isinstance(chunk, AIMessage) and chunk.content:
                 if len(chunk.content) > LENGTH_THRES:
                     continue
