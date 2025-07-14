@@ -1,7 +1,7 @@
 import uuid
 
 import httpx
-import requests
+import requests  # type: ignore[import-untyped]
 import streamlit as st
 
 SUCCESS = 200
