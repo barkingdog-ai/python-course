@@ -10,6 +10,7 @@ authors = [
 requires-python = ">=3.13.5,<3.14"
 dependencies = [
     "rich>=14.0.0",
+    "langgraph>=0.5.0",
     "icecream>=2.1.5",
     "loguru>=0.7.3",
     "python-dotenv>=1.1.1",
@@ -17,6 +18,7 @@ dependencies = [
     "pydantic-settings>=2.10.1",
     "orjson>=3.10.18",
     "ruamel-yaml>=0.18.14",
+    "opencv-python>=4.11.0.86",
 ]
 
 
@@ -30,7 +32,8 @@ langchain = [
     "langchain-core>=0.3.67",
     "langchain-community>=0.3.27",
     "langchain-experimental>=0.3.4",
-    "langchain-openai>=0.3.27",
+    "langchain-openai>=0.3.25",
+    "langchain-google-genai>=2.1.6",
 ]
 api = [
     "fastapi[all]>=0.115.14",
