@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import httpx
@@ -71,7 +72,8 @@ if user_input:
             for sse in event_source.iter_sse():
                 if sse.event == EVENT_TYPE:
                     token = sse.data
-                    full_response += token
+                    token = json.loads(token)
+                    full_response += token["text"]
                     message_placeholder.markdown(full_response)
                 elif sse.event == FINISH:
                     break

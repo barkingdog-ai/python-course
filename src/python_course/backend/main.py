@@ -63,13 +63,13 @@ def chat_stream(req: ChatRequest) -> StreamingResponse:
     }
     config = cast("RunnableConfig", {"configurable": {"thread_id": thread_id}})
 
-    def event_generator() -> Generator[str, None, None]:
+    def event_generator() -> Generator[str, None]:
         # Prevent timeout
         yield "event: ping\ndata: keepalive\n\n"
         for chunk, _ in langgraph_app.stream(state, config, stream_mode="messages"):  # type: ignore[arg-type]
             if isinstance(chunk, AIMessageChunk) and chunk.content:
-                data_str: str = orjson.dumps(obj=chunk.content).decode()
-                yield f"event: chunk\ndata: {data_str}\n\n"
+                data_str: str = orjson.dumps({"text": chunk.content}).decode()
+                yield f"event: {'chunk'}\ndata: {data_str}\n\n"
         yield f"event: {'end'}\ndata: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
