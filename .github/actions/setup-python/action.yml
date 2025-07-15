@@ -5,7 +5,7 @@ description: |
 inputs:
   uv-version:
     description: uv version
-    default: 0.7.13
+    default: 0.7.19
 
 runs:
   using: composite
