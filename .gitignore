@@ -10,9 +10,6 @@ __pycache__/
 # C extensions
 *.so
 
-# macOS
-.DS*
-
 # Distribution / packaging
 .Python
 build/
