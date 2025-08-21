@@ -184,6 +184,7 @@ pyrightconfig.json
 .DS_Store
 .AppleDouble
 .LSOverride
+/chatbot
 
 # uncomment if you don't need it
 playground/
